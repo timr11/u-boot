@@ -16,6 +16,7 @@
 #include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
+#include <mach/tzc.h>
 #include <linux/libfdt.h>
 
 u32 spl_boot_device(void)
@@ -90,6 +91,89 @@ void spl_display_print(void)
 __weak int board_early_init_f(void)
 {
 	return 0;
+}
+
+uint32_t stm32mp_get_dram_size(void)
+{
+	uint32_t ram_size = 0;
+	struct udevice *dev;
+	ofnode node;
+
+	if (uclass_get_device(UCLASS_RAM, 0, &dev))
+		return 0;
+
+	dev_for_each_subnode(node, dev) {
+		ram_size = ofnode_read_u32_default(node, "st,mem-size", 0);
+		if (ram_size)
+			break;
+	}
+
+	return ram_size;
+}
+
+uint32_t optee_get_reserved_memory_base(void)
+{
+	ofnode node;
+	fdt_addr_t start;
+
+	node = ofnode_path("/reserved-memory/optee");
+	if (!ofnode_valid(node))
+		return 0;
+
+	start = ofnode_get_addr(node);
+	return (start < 0) ? 0 : (uintptr_t)start;
+}
+
+#define CFG_TZDRAM_SIZE		0x01e00000
+#define STM32_TZC_NSID_ALL		0xffff
+#define STM32_TZC_FILTER_ALL		3
+
+void stm32_init_tzc_for_optee(void)
+{
+	const uint32_t dram_size = stm32mp_get_dram_size();
+	const uintptr_t dram_top = STM32_DDR_BASE + (dram_size - 1);
+	uint32_t optee_base = optee_get_reserved_memory_base();
+	uint32_t tee_shmem_base = optee_base + CFG_TZDRAM_SIZE;
+	const uintptr_t tzc = STM32_TZC_BASE;
+
+	if (dram_size == 0)
+		panic("Cannot determine DRAM size from devicetree\n");
+
+	const struct tzc_region optee_config[] = {
+		{
+			.base = STM32_DDR_BASE,
+			.top = optee_base - 1,
+			.sec_mode = TZC_ATTR_SEC_NONE,
+			.nsec_id = STM32_TZC_NSID_ALL,
+			.filters_mask = STM32_TZC_FILTER_ALL,
+		}, {
+			.base = optee_base,
+			.top = tee_shmem_base - 1,
+			.sec_mode = TZC_ATTR_SEC_RW,
+			.nsec_id = 0,
+			.filters_mask = STM32_TZC_FILTER_ALL,
+		}, {
+			.base = tee_shmem_base,
+			.top = dram_top,
+			.sec_mode = TZC_ATTR_SEC_NONE,
+			.nsec_id = STM32_TZC_NSID_ALL,
+			.filters_mask = STM32_TZC_FILTER_ALL,
+		}, {
+			.top = 0,
+		}
+	};
+
+	flush_dcache_all();
+
+	tzc_configure(tzc, optee_config);
+	tzc_dump_config(tzc);
+
+	dcache_disable();
+}
+
+void spl_board_prepare_for_optee(void *fdt)
+{
+	stm32_init_tzc_for_optee();
 }
 
 void board_init_f(ulong dummy)
