@@ -10,6 +10,7 @@ obj-y += bsec.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
+obj-y += tzc400.o
 obj-$(CONFIG_STM32_ECDSA_VERIFY) += ecdsa_romapi.o
 else
 obj-y += cmd_stm32prog/
