@@ -15,6 +15,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 #endif /* !USE_HOSTCC*/
 #include <image.h>
+#include <u-boot/ecdsa.h>
 #include <u-boot/rsa.h>
 #include <u-boot/hash-checksum.h>
 
@@ -82,8 +83,17 @@ struct crypto_algo crypto_algos[] = {
 		.sign = rsa_sign,
 		.add_verify_data = rsa_add_verify_data,
 		.verify = rsa_verify,
-	}
-
+	},
+#if defined(USE_HOSTCC)
+	/* Currently, only host support exists for ECDSA */
+	{
+		.name = "ecdsa256",
+		.key_len = ECDSA256_BYTES,
+		.sign = ecdsa_sign,
+		.add_verify_data = ecdsa_add_verify_data,
+		.verify = ecdsa_verify,
+	},
+#endif
 };
 
 struct padding_algo padding_algos[] = {
