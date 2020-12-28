@@ -106,6 +106,7 @@ dumpimage-mkimage-objs := aisimage.o \
 			socfpgaimage.o \
 			lib/crc16.o \
 			lib/hash-checksum.o \
+			lib/fdt-libcrypto.o \
 			lib/sha1.o \
 			lib/sha256.o \
 			lib/sha512.o \
