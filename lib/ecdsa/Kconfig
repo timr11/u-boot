@@ -1,0 +1,23 @@
+config ECDSA
+	bool "Enable ECDSA support"
+	depends on DM
+	help
+	  This enables the ECDSA algorithm for FIT image verification in U-Boot.
+	  See doc/uImage.FIT/signature.txt for more details.
+	  The ECDSA algorithm is implemented using the driver model. So
+	  CONFIG_DM is required by this library.
+	  ECDSA is enabled for mkimage regardless of this  option.
+
+if ECDSA
+
+config ECDSA_VERIFY
+	bool "Enable ECDSA verification support in U-Boot."
+	help
+	  Allow ECDSA signatures to be recognized and verified in U-Boot.
+
+config SPL_ECDSA_VERIFY
+	bool "Enable ECDSA verification support in SPL"
+	help
+	  Allow ECDSA signatures to be recognized and verified in SPL.
+
+endif
