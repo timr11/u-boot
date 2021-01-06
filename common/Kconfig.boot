@@ -67,8 +67,8 @@ config FIT_SIGNATURE
 	bool "Enable signature verification of FIT uImages"
 	depends on DM
 	select HASH
-	select RSA
-	select RSA_VERIFY
+	imply RSA
+	imply RSA_VERIFY
 	select IMAGE_SIGN_INFO
 	help
 	  This option enables signature verification of FIT uImages,
@@ -159,8 +159,8 @@ config SPL_FIT_SIGNATURE
 	select SPL_FIT
 	select SPL_CRYPTO_SUPPORT
 	select SPL_HASH_SUPPORT
-	select SPL_RSA
-	select SPL_RSA_VERIFY
+	imply SPL_RSA
+	imply SPL_RSA_VERIFY
 	select SPL_IMAGE_SIGN_INFO
 
 config SPL_LOAD_FIT
