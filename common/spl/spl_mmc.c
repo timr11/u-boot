@@ -80,7 +80,18 @@ int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
 		goto end;
 	}
 
-	if (IS_ENABLED(CONFIG_SPL_LOAD_FIT) &&
+	if (IS_ENABLED(CONFIG_SPL_LOAD_FIT_FULL) &&
+		image_get_magic(header) == FDT_MAGIC) {
+		void * buf = (void *)0xd0000000;
+
+		debug("Found FIT\n");
+
+		size_t count = (fdt_totalsize(header) + (mmc->read_bl_len - 1)) / mmc->read_bl_len;
+
+		count = 4096 << 2;
+		blk_dread(mmc_get_blk_desc(mmc), sector, count, buf);
+		ret = spl_parse_image_header(spl_image, buf);
+	} else if (IS_ENABLED(CONFIG_SPL_LOAD_FIT) &&
 	    image_get_magic(header) == FDT_MAGIC) {
 		struct spl_load_info load;
 
