@@ -434,6 +434,7 @@ static int fit_config_verify_required_sigs(const void *fit, int conf_noffset,
 		return 0;
 	}
 
+
 	/* Get required-mode policy property from DTB */
 	reqd_mode = fdt_getprop(sig_blob, sig_node, "required-mode", NULL);
 	if (reqd_mode && !strcmp(reqd_mode, "any"))

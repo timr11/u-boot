@@ -295,8 +295,9 @@ config AES
 	  supported by the algorithm but only a 128-bit key is supported at
 	  present.
 
-source lib/rsa/Kconfig
 source lib/crypto/Kconfig
+source lib/rsa/Kconfig
+source lib/ecdsa/Kconfig
 
 config TPM
 	bool "Trusted Platform Module (TPM) Support"

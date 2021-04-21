@@ -209,7 +209,7 @@ def test_vboot(u_boot_console, sha_algo, padding, sign_options, required,
 
         # Build the FIT, but don't sign anything yet
         cons.log.action('%s: Test FIT with signed images' % sha_algo)
-        make_fit('sign-images-%s%s.its' % (sha_algo, padding))
+        make_fit('sign-images-%s%s-rsa.its' % (sha_algo, padding))
         run_bootm(sha_algo, 'unsigned images', 'dev-', True)
 
         # Sign images with our dev keys
@@ -220,7 +220,7 @@ def test_vboot(u_boot_console, sha_algo, padding, sign_options, required,
         dtc('sandbox-u-boot.dts')
 
         cons.log.action('%s: Test FIT with signed configuration' % sha_algo)
-        make_fit('sign-configs-%s%s.its' % (sha_algo, padding))
+        make_fit('sign-configs-%s%s-rsa.its' % (sha_algo, padding))
         run_bootm(sha_algo, 'unsigned config', '%s+ OK' % sha_algo, True)
 
         # Sign images with our dev keys
@@ -270,7 +270,7 @@ def test_vboot(u_boot_console, sha_algo, padding, sign_options, required,
             run_bootm(sha_algo, 'evil kernel@', msg, False, efit)
 
         # Create a new properly signed fit and replace header bytes
-        make_fit('sign-configs-%s%s.its' % (sha_algo, padding))
+        make_fit('sign-configs-%s%s-rsa.its' % (sha_algo, padding))
         sign_fit(sha_algo, sign_options)
         bcfg = u_boot_console.config.buildconfig
         max_size = int(bcfg.get('config_fit_signature_max_size', 0x10000000), 0)
@@ -324,12 +324,12 @@ def test_vboot(u_boot_console, sha_algo, padding, sign_options, required,
 
         # Build the FIT with prod key (keys required) and sign it. This puts the
         # signature into sandbox-u-boot.dtb, marked 'required'
-        make_fit('sign-configs-%s%s-prod.its' % (sha_algo, padding))
+        make_fit('sign-configs-%s%s-prod-rsa.its' % (sha_algo, padding))
         sign_fit(sha_algo, sign_options)
 
         # Build the FIT with dev key (keys NOT required). This adds the
         # signature into sandbox-u-boot.dtb, NOT marked 'required'.
-        make_fit('sign-configs-%s%s.its' % (sha_algo, padding))
+        make_fit('sign-configs-%s%s-rsa.its' % (sha_algo, padding))
         sign_fit_norequire(sha_algo, sign_options)
 
         # So now sandbox-u-boot.dtb two signatures, for the prod and dev keys.
@@ -341,7 +341,7 @@ def test_vboot(u_boot_console, sha_algo, padding, sign_options, required,
 
         # Build the FIT with dev key (keys required) and sign it. This puts the
         # signature into sandbox-u-boot.dtb, marked 'required'.
-        make_fit('sign-configs-%s%s.its' % (sha_algo, padding))
+        make_fit('sign-configs-%s%s-rsa.its' % (sha_algo, padding))
         sign_fit(sha_algo, sign_options)
 
         # Set the required-mode policy to "any".

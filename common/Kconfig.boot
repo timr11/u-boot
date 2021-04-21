@@ -93,6 +93,28 @@ config FIT_SIGNATURE
 	  format support in this case, enable it using
 	  CONFIG_LEGACY_IMAGE_FORMAT.
 
+config FIT_SIGNATURE_ECDSA
+	bool "Enable signature verification of FIT uImages"
+	depends on DM
+	select HASH
+	select ECDSA
+	select ECDSA_VERIFY
+	select OPENSSL
+	select IMAGE_SIGN_INFO
+	select FIT_FULL_CHECK
+	help
+	  This option enables signature verification of FIT uImages,
+	  using a hash signed and verified using ECDSA. If
+	  CONFIG_SHA_PROG_HW_ACCEL is defined, i.e support for progressive
+	  hashing is available using hardware, then the ECDSA library will use
+	  it. See doc/uImage.FIT/signature.txt for more details.
+
+	  WARNING: When relying on signed FIT images with a required signature
+	  check the legacy image format is disabled by default, so that
+	  unsigned images cannot be loaded. If a board needs the legacy image
+	  format support in this case, enable it using
+	  CONFIG_LEGACY_IMAGE_FORMAT.
+
 config FIT_SIGNATURE_MAX_SIZE
 	hex "Max size of signed FIT structures"
 	depends on FIT_SIGNATURE

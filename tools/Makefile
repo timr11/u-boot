@@ -70,7 +70,8 @@ RSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/rsa/, \
 					rsa-sign.o rsa-verify.o \
 					rsa-mod-exp.o)
 
-ECDSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/ecdsa/, ecdsa-libcrypto.o)
+ECDSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/ecdsa/, \
+					ecdsa-sign.o ecdsa-verify.o)
 
 AES_OBJS-$(CONFIG_FIT_CIPHER) := $(addprefix lib/aes/, \
 					aes-encrypt.o aes-decrypt.o)

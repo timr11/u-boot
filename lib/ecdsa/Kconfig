@@ -1,0 +1,17 @@
+config ECDSA
+	bool "Use ECDSA Library"
+	help
+	  ECDSA support. This enables the ECDSA algorithm used for FIT image
+	  verification in U-Boot.
+	  See doc/uImage.FIT/signature.txt for more details.
+	  The verification algorithm has the option to be handled purely by software,
+	  or to use a hardware crypto driver if available.
+	  The signing part is built into mkimage regardless of this option.
+
+if ECDSA
+
+config ECDSA_VERIFY
+	bool
+	select SIXTY_FOUR_BIT_LONG
+
+endif

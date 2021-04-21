@@ -64,7 +64,7 @@ int ecdsa_add_verify_data(struct image_sign_info *info, void *keydest)
 }
 #endif
 
-#if IMAGE_ENABLE_VERIFY_ECDSA
+#ifdef CONFIG_FIT_SIGNATURE_ECDSA
 /**
  * verify() - Verify a signature against some data
  *
