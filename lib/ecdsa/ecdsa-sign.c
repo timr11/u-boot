@@ -284,6 +284,7 @@ static int do_sign(struct signer *ctx, struct image_sign_info *info,
 	return 0;
 }
 
+static int ecdsa_check_signature(struct signer *ctx, struct image_sign_info *info) __attribute__((unused));
 static int ecdsa_check_signature(struct signer *ctx, struct image_sign_info *info)
 {
 	ECDSA_SIG *sig;
@@ -301,8 +302,8 @@ static int ecdsa_check_signature(struct signer *ctx, struct image_sign_info *inf
 		goto sig_err;
 	}
 
-	/* if ((ret = ECDSA_do_verify(ctx->digest, info->checksum->checksum_len, sig, pubkey)) == 0) */
-	/* 	fprintf(stderr, "WARNING: Signature is fake news!\n"); */
+	if ((ret = ECDSA_do_verify(ctx->digest, info->checksum->checksum_len, sig, pubkey)) == 0)
+		fprintf(stderr, "WARNING: Signature is fake news!\n");
 
 	ECDSA_SIG_free(sig);
 	EC_KEY_free(pubkey);
@@ -331,7 +332,8 @@ int ecdsa_sign(struct image_sign_info *info, const struct image_region region[],
 		*sigp = ctx.signature;
 		*sig_len = info->crypto->key_len * 2;
 
-		ret = ecdsa_check_signature(&ctx, info);
+		// TODO: ECDSA_do_verify is causing a segfault, figure out why
+		/* ret = ecdsa_check_signature(&ctx, info); */
 	}
 
 	free_ctx(&ctx);
@@ -343,7 +345,6 @@ int ecdsa_sign(struct image_sign_info *info, const struct image_region region[],
 static int do_add(struct signer *ctx, const struct image_sign_info *info, void *fdt, const char *key_node_name)
 {
 	int signature_node, key_node, ret, key_bits;
-	/* const char *curve_name; */
 	int curve_nid;
 	const EC_GROUP *group;
 	const EC_POINT *point;
@@ -390,7 +391,6 @@ static int do_add(struct signer *ctx, const struct image_sign_info *info, void *
 	group = EC_KEY_get0_group(ctx->pkey);
 	key_bits = EC_GROUP_order_bits(group);
 	curve_nid = EC_GROUP_get_curve_name(group);
-	/* curve_name = OBJ_nid2sn(EC_GROUP_get_curve_name(group)); */
 	/* Let 'x' and 'y' memory leak by not BN_free()'ing them. */
 	x = BN_new();
 	y = BN_new();
