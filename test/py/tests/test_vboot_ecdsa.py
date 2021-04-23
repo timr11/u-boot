@@ -34,7 +34,11 @@ import vboot_evil
 # Only run the full suite on a few combinations, since it doesn't add any more
 # test coverage.
 TESTDATA = [
-    ['sha256', None, False, True],
+    ['sha1', None, False, True],
+    ['sha1', '-E -p 0x10000', False, False],
+    ['sha1', None, False, False],
+    ['sha1', '-E -p 0x10000', False, False],
+    ['sha256', None, False, False],
     ['sha256', '-E -p 0x10000', False, False],
     ['sha256', None, False, False],
     ['sha256', '-E -p 0x10000', False, False],
@@ -177,11 +181,6 @@ def test_vboot(u_boot_console, sha_algo, sign_options, required,
         util.run_and_log(cons, 'openssl ecparam -name prime256v1 -genkey -noout '
                      '-out %s%s.pem ' %
                      (tmpdir, name))
-
-        # Create a certificate containing the public key
-        util.run_and_log(cons, 'openssl ec -in %s%s-private.pem -pubout -out '
-                     '%s%s-public.pem ' %
-                     (tmpdir, name, tmpdir, name))
 
     def test_with_algo(sha_algo, sign_options):
         """Test verified boot with the given hash algorithm.
